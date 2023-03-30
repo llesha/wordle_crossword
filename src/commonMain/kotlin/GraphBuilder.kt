@@ -47,13 +47,34 @@ class Graph {
      */
     fun getFourLetters(): MutableMap<String, Int> {
         val res = mutableMapOf<String, Int>()
-        for (set in first.values) {
+        for (set in first.values)
             for (firstWord in set) {
-                if(first[firstWord.last()] == null)
+                if (first[firstWord.last()] == null)
                     continue
-                for (secondWord in first[firstWord.last()]!!) {
+                for (secondWord in first[firstWord.last()]!!)
                     addOrCreateSet(res, getFourLetters(firstWord, secondWord))
-                }
+            }
+        return res
+    }
+
+    /**
+     * based on four-lettered corners, get:
+     * ab*
+     * efc
+     * __d
+     */
+    fun getFShaped(fourLetters: MutableMap<String, Int>): MutableMap<String, Int> {
+        val res = mutableMapOf<String, Int>()
+        for (corner in fourLetters.keys) {
+            if (third[corner[2]] == null)
+                continue
+            for (middleWord in third[corner[2]]!!) {
+                val withB = first[corner[1]]?.filter { it[2] == middleWord[2] }
+                if(withB == null || withB.isEmpty())
+                    continue
+                val withA = first[corner[0]]!!.filter { it[2] == middleWord[0] }
+                if(withA.isEmpty())
+                    continue
             }
         }
         return res
