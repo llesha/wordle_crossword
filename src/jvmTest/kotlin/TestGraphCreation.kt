@@ -8,11 +8,6 @@ class TestGraphCreation {
         val words = File("./src/commonMain/resources/nouns.txt").readLines().toTypedArray()
         println(words)
         val graph = GraphBuilder().parseWords(words)
-        val first = graph.getFirstFiveLetters()
-        println(first.size)
-        val last = graph.getLastFiveLetters()
-        println(last.size)
-        intersectTwoMaps(first, last)
     }
 }
 
