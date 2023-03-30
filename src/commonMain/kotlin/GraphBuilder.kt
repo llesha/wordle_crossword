@@ -45,17 +45,14 @@ class Graph {
      * __c
      * __d
      */
-    fun getFourLetters(): MutableMap<Pair<Char, Char>, MutableList<String>> {
-        val res = mutableMapOf<Pair<Char, Char>, MutableList<String>>()
+    fun getFourLetters(): MutableMap<String, Int> {
+        val res = mutableMapOf<String, Int>()
         for (set in first.values) {
-
-            for (i in set) {
-                for (j in set - i) {
-                    addOrCreateList(
-                        res,
-                        i.last() to j.last(),
-                        wordToThreeLetters(i).reversed() + wordToThreeLetters(j).substring(1)
-                    )
+            for (firstWord in set) {
+                if(first[firstWord.last()] == null)
+                    continue
+                for (secondWord in first[firstWord.last()]!!) {
+                    addOrCreateSet(res, getFourLetters(firstWord, secondWord))
                 }
             }
         }
@@ -64,6 +61,13 @@ class Graph {
 
     private fun wordToThreeLetters(word: String): String {
         return word[0].toString() + word[2].toString() + word[4].toString()
+    }
+
+    /**
+     * abcde, efghi -> acgi
+     */
+    private fun getFourLetters(first: String, second: String): String {
+        return first[0].toString() + first[2] + second[2] + second[4]
     }
 }
 
@@ -80,8 +84,8 @@ fun addOrCreateList(map: MutableMap<Pair<Char, Char>, MutableList<String>>, key:
     map[key]!!.add(e)
 }
 
-fun addOrCreatePairInSet(map: MutableMap<Pair<Char, Char>, MutableSet<String>>, added: Pair<Char, Char>) {
-    if(map[added] == null) {
-
-    }
+fun addOrCreateSet(map: MutableMap<String, Int>, added: String) {
+    if (map[added] == null)
+        map[added] = 0
+    map[added] = map[added]!! + 1
 }

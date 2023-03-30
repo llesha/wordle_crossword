@@ -8,6 +8,8 @@ class TestGraphCreation {
         val words = File("./src/commonMain/resources/nouns.txt").readLines().toTypedArray()
         println(words)
         val graph = GraphBuilder().parseWords(words)
+        val res = graph.getFourLetters()
+        println()
     }
 }
 
