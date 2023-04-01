@@ -23,20 +23,30 @@ class Graph {
     val firstTwo = mutableMapOf<Pair<Char, Char>, MutableSet<String>>()
     val lastTwo = mutableMapOf<Pair<Char, Char>, MutableSet<String>>()
 
-    fun getAllTripleCombinations(): MutableList<Pair<Triple<Char, Char, Char>, Int>> {
-        val res = mutableListOf<Pair<Triple<Char, Char, Char>, Int>>()
+    fun getAllTripleCombinations(): MutableMap<Triple<Char, Char, Char>, List<String>> {
+        val res = mutableMapOf<Triple<Char, Char, Char>, List<String>>()
         for (f in first.keys)
             for (s in second.keys)
                 for (t in third.keys) {
                     val num = calcIntersection(f, s, t)
-                    if (num != 0)
-                        res.add(Triple(f, s, t) to num)
+                    if (num.isNotEmpty())
+                        res[Triple(f, s, t)] = num
                 }
         return res
     }
 
-    private fun calcIntersection(l1: Char, l2: Char, l3: Char): Int {
-        return first[l1]!!.count { it[2] == l2 && it[4] == l3 }
+    fun getTwoLetterQuantity(): MutableMap<String, Int> {
+        val res = mutableMapOf<String, Int>()
+        for (f in first) {
+            for (str in f.value) {
+                addOrCreateSet(res, f.key.toString() + str[2])
+            }
+        }
+        return res
+    }
+
+    private fun calcIntersection(l1: Char, l2: Char, l3: Char): List<String> {
+        return first[l1]!!.filter { it[2] == l2 && it[4] == l3 }
     }
 
     /**
@@ -45,38 +55,15 @@ class Graph {
      * __c
      * __d
      */
-    fun getFourLetters(): MutableMap<String, Int> {
-        val res = mutableMapOf<String, Int>()
+    fun getFourLetters(): Counter<String> {
+        val res = Counter<String>()
         for (set in first.values)
             for (firstWord in set) {
                 if (first[firstWord.last()] == null)
                     continue
                 for (secondWord in first[firstWord.last()]!!)
-                    addOrCreateSet(res, getFourLetters(firstWord, secondWord))
+                    res.add(getFourLetters(firstWord, secondWord))
             }
-        return res
-    }
-
-    /**
-     * based on four-lettered corners, get:
-     * ab*
-     * efc
-     * __d
-     */
-    fun getFShaped(fourLetters: MutableMap<String, Int>): MutableMap<String, Int> {
-        val res = mutableMapOf<String, Int>()
-        for (corner in fourLetters.keys) {
-            if (third[corner[2]] == null)
-                continue
-            for (middleWord in third[corner[2]]!!) {
-                val withB = first[corner[1]]?.filter { it[2] == middleWord[2] }
-                if(withB == null || withB.isEmpty())
-                    continue
-                val withA = first[corner[0]]!!.filter { it[2] == middleWord[0] }
-                if(withA.isEmpty())
-                    continue
-            }
-        }
         return res
     }
 
@@ -109,4 +96,26 @@ fun addOrCreateSet(map: MutableMap<String, Int>, added: String) {
     if (map[added] == null)
         map[added] = 0
     map[added] = map[added]!! + 1
+}
+
+class Counter<T>() {
+    constructor(list: List<T>) : this() {
+        map[list.first()] = 1
+    }
+
+    private val map = mutableMapOf<T, Int>()
+    val keys: Set<T>
+        get() = map.keys
+    val values: MutableCollection<Int>
+        get() = map.values
+
+    fun add(value: T) {
+        if (!map.containsKey(value))
+            map[value] = 0
+        map[value] = map[value]!! + 1
+    }
+
+    operator fun get(value: T): Int? {
+        return map[value]
+    }
 }
